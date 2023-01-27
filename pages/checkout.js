@@ -6,13 +6,10 @@ import Image from "next/image";
 export default function CheckoutPage() {
   const { selectedProducts, setSelectedProducts } = useContext(ProductsContext);
   const [productsInfos, setProductsInfos] = useState([]);
-  const [address, setAddress] = useState('')
-  const [city, setCity] = useState('')
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-
-
-
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     const uniqIds = [...new Set(selectedProducts)];
@@ -34,12 +31,22 @@ export default function CheckoutPage() {
     }
   }
 
+  const deliveryPrice = 5;
+  let subtotal = 0;
+  if (selectedProducts?.length) {
+    for (let id of selectedProducts) {
+      const price = productsInfos.find(p => p._id === id)?.price || 0;
+      subtotal += price;
+    }
+  }
+
+  const total = subtotal + deliveryPrice;
   return (
     <Layout>
       {!productsInfos.length && <div>no products in your shopping cart</div>}
       {productsInfos.length &&
         productsInfos.map((productsInfo) => (
-          <div className="flex mb-5">
+          <div className="flex mb-5" key={productsInfo._id}>
             <div className="bg-gray-100 p-3 rounded-xl shrink-0">
               <Image
                 src={productsInfo.picture}
@@ -77,19 +84,52 @@ export default function CheckoutPage() {
             </div>
           </div>
         ))}
-       
-        <div className="mt-4">
-            <input value={address} onChange={e => setAddress(e.target.value)} className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2" type="text" placeholder="Street address, number" />
-            <input value={city}    onChange={e => setCity(e.target.value)} className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2" type="text" placeholder="City and postal code" />
-            <input value={name}    onChange={e => setName(e.target.value)} className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2" type="text" placeholder="Your Name" />
-            <input value={email}   onChange={e => setEmail(e.target.value)} className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2" type="email" placeholder="Email address" />
+
+      <div className="mt-4">
+        <input
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2"
+          type="text"
+          placeholder="Street address, number"
+        />
+        <input
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2"
+          type="text"
+          placeholder="City and postal code"
+        />
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2"
+          type="text"
+          placeholder="Your Name"
+        />
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2"
+          type="email"
+          placeholder="Email address"
+        />
+      </div>
+      <div className="mt-4">
+        <div className="flex my-3">
+          <h3 className="grow font-bold text-gray-400">Subtotal:</h3>
+          <h3 className="font-bold">${subtotal}</h3>
         </div>
-        <div className="mt-4">
-            <div className="flex">
-              <h3>Subtotal:</h3>  
-              <h3>$123</h3>  
-            </div>
+        <div className="flex my-3">
+          <h3 className="grow font-bold text-gray-400">Delivery:</h3>
+          <h3 className="font-bold">${deliveryPrice}</h3>
         </div>
+        <div className="flex my-3 border-t pt-3 border-dashed border-emerald-500">
+          <h3 className="grow font-bold text-gray-400">Total:</h3>
+          <h3 className="font-bold">${total}</h3>
+        </div>
+        <button className="bg-emerald-500 px-5 py-2 rounded-xl font-bold text-white w-full my-4 shadow-emerald-300 shadow-lg ">Pay ${total}</button>
+      </div>
     </Layout>
   );
 }
